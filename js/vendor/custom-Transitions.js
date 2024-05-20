@@ -1,103 +1,115 @@
-PLAYGROUND.Transitions = function(app) {
+PLAYGROUND.Transitions = function (app) {
+  this.app = app;
 
-	this.app = app;
+  app.on("enterstate", this.enterstate.bind(this));
+  app.on("postrender", this.postrender.bind(this));
+  app.on("step", this.step.bind(this));
 
-	app.on("enterstate", this.enterstate.bind(this));
-	app.on("postrender", this.postrender.bind(this));
-	app.on("step", this.step.bind(this));
-
-	this.progress = 1;
-	this.lifetime = 0;
+  this.progress = 1;
+  this.lifetime = 0;
 };
 
 PLAYGROUND.Transitions.plugin = true;
 
 PLAYGROUND.Transitions.prototype = {
+  enterstate: function (data) {
+    this.screenshot = this.app.layer.cache();
 
-	enterstate: function(data) {
+    if (data.prev) {
+      this.lifetime = 0;
+      this.progress = 0;
+    }
+  },
 
-		this.screenshot = this.app.layer.cache();
+  postrender: function () {
+    if (this.progress >= 1) return;
 
-		if (data.prev) {
-			this.lifetime = 0;
-			this.progress = 0;
-		}
+    PLAYGROUND.Transitions.Explode(this, this.progress);
+  },
 
-	},
+  step: function (delta) {
+    if (this.progress >= 1) return;
 
-	postrender: function() {
+    this.lifetime += delta;
 
-		if (this.progress >= 1) return;
-
-		PLAYGROUND.Transitions.Explode(this, this.progress);
-
-	},
-
-	step: function(delta) {
-
-		if (this.progress >= 1) return;
-
-		this.lifetime += delta;
-
-		this.progress = Math.min(this.lifetime, 1);
-
-	}
-
+    this.progress = Math.min(this.lifetime, 1);
+  },
 };
 
-PLAYGROUND.Transitions.Implode = function(manager, progress) {
+PLAYGROUND.Transitions.Implode = function (manager, progress) {
+  var app = manager.app;
+  var layer = app.layer;
 
-	var app = manager.app;
-	var layer = app.layer;
+  progress = app.ease(progress, "outCubic");
 
-	progress = app.ease(progress, "outCubic");
+  var negative = 1 - progress;
 
-	var negative = 1 - progress;
+  layer.save();
+  layer.tars(
+    app.center.x,
+    app.center.y,
+    0.5,
+    0.5,
+    0,
+    0.5 + 0.5 * negative,
+    negative
+  );
+  layer.drawImage(manager.screenshot, 0, 0);
 
-	layer.save();
-	layer.tars(app.center.x, app.center.y, 0.5, 0.5, 0, 0.5 + 0.5 * negative, negative);
-	layer.drawImage(manager.screenshot, 0, 0);
-
-	layer.restore();
-
+  layer.restore();
 };
 
+PLAYGROUND.Transitions.Explode = function (manager, progress) {
+  var app = manager.app;
+  var layer = app.layer;
 
-PLAYGROUND.Transitions.Explode = function(manager, progress) {
+  progress = app.ease(progress, "outExpo");
 
-	var app = manager.app;
-	var layer = app.layer;
+  var scale = 1 + progress * 1;
 
-	progress = app.ease(progress, "outExpo");
-
-	var scale = 1 + progress * 1;
-
-	
-	layer.save();
-	layer.a(1-progress);
-	layer.tars(app.center.x, app.center.y, 0.5, 0.5, 0, scale, scale);
-	layer.drawImage(manager.screenshot, 0, 0);
-	layer.fillStyle( 'rgba(255, 255, 255, 0.5)' );
-	layer.fillRect( 0, 0, app.width, app.height );
-	layer.restore();
-
+  layer.save();
+  layer.a(1 - progress);
+  layer.tars(app.center.x, app.center.y, 0.5, 0.5, 0, scale, scale);
+  layer.drawImage(manager.screenshot, 0, 0);
+  layer.fillStyle("rgba(255, 255, 255, 0.5)");
+  layer.fillRect(0, 0, app.width, app.height);
+  layer.restore();
 };
 
-PLAYGROUND.Transitions.Split = function(manager, progress) {
+PLAYGROUND.Transitions.Split = function (manager, progress) {
+  var app = manager.app;
+  var layer = app.layer;
 
-	var app = manager.app;
-	var layer = app.layer;
+  progress = app.ease(progress, "inOutCubic");
 
-	progress = app.ease(progress, "inOutCubic");
+  var negative = 1 - progress;
 
-	var negative = 1 - progress;
+  layer.save();
 
-	layer.save();
+  layer.a(negative).clear("#000").ra();
 
-	layer.a(negative).clear("#000").ra();
+  layer.drawImage(
+    manager.screenshot,
+    0,
+    0,
+    app.width,
+    (app.height / 2) | 0,
+    0,
+    0,
+    app.width,
+    ((negative * app.height) / 2) | 0
+  );
+  layer.drawImage(
+    manager.screenshot,
+    0,
+    (app.height / 2) | 0,
+    app.width,
+    (app.height / 2) | 0,
+    0,
+    (app.height / 2 + (progress * app.height) / 2 + 1) | 0,
+    app.width,
+    Math.max(1, (negative * app.height * 0.5) | 0)
+  );
 
-	layer.drawImage(manager.screenshot, 0, 0, app.width, app.height / 2 | 0, 0, 0, app.width, negative * app.height / 2 | 0);
-	layer.drawImage(manager.screenshot, 0, app.height / 2 | 0, app.width, app.height / 2 | 0, 0, app.height / 2 + progress * app.height / 2 + 1 | 0, app.width, Math.max(1, negative * app.height * 0.5 | 0));
-
-	layer.restore();
+  layer.restore();
 };

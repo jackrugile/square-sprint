@@ -1,11 +1,9 @@
-$.entity = function( opt ) {};
+$.entity = function (opt) {};
 
-$.entity.prototype.init = function( opt ) {
-	$.merge( this, opt );
+$.entity.prototype.init = function (opt) {
+  $.merge(this, opt);
 };
 
-$.entity.prototype.step = function() {
-};
+$.entity.prototype.step = function () {};
 
-$.entity.prototype.render = function() {
-};
+$.entity.prototype.render = function () {};

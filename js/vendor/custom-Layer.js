@@ -1,43 +1,47 @@
-PLAYGROUND.Renderer = function(app) {
+PLAYGROUND.Renderer = function (app) {
+  this.app = app;
 
-	this.app = app;
-
-	app.on("create", this.create.bind(this));
-	app.on("resize", this.resize.bind(this));
-
+  app.on("create", this.create.bind(this));
+  app.on("resize", this.resize.bind(this));
 };
 
 PLAYGROUND.Renderer.plugin = true;
 
 PLAYGROUND.Renderer.prototype = {
+  create: function (data) {
+    this.app.layer = cq().appendTo(this.app.container);
 
-	create: function(data) {
+    if (!this.app.customContainer) {
+      this.app.container.style.margin = "0px";
+      this.app.container.style.overflow = "hidden";
+    }
+  },
 
-		this.app.layer = cq().appendTo(this.app.container);
+  resize: function (data) {
+    var app = this.app;
 
-		if (!this.app.customContainer) {
-			this.app.container.style.margin = "0px";
-			this.app.container.style.overflow = "hidden";
-		}
+    var layer = app.layer;
 
-	},
+    layer.width = app.width;
+    layer.height = app.height;
 
-	resize: function(data) {
+    layer.canvas.style.transformOrigin = "0 0";
+    layer.canvas.style.transform =
+      "translate(" +
+      app.offsetX +
+      "px," +
+      app.offsetY +
+      "px) scale(" +
+      app.scale +
+      ", " +
+      app.scale +
+      ")";
 
-		var app = this.app;
+    layer.smoothing = this.app.smoothing;
+    layer.update();
 
-		var layer = app.layer;
-
-		layer.width = app.width;
-		layer.height = app.height;
-
-		layer.canvas.style.transformOrigin = "0 0";
-		layer.canvas.style.transform = "translate(" + app.offsetX + "px," + app.offsetY + "px) scale(" + app.scale + ", " + app.scale + ")";
-
-		layer.smoothing = this.app.smoothing;
-		layer.update();
-
-		layer.canvas.style.imageRendering = this.app.smoothing ? "auto" : "pixelated";
-	}
-
+    layer.canvas.style.imageRendering = this.app.smoothing
+      ? "auto"
+      : "pixelated";
+  },
 };
