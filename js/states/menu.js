@@ -12,6 +12,9 @@ $.stateMenu.enter = function () {
     h: 80,
   };
   this.hoveringButton = false;
+
+  this.particleTickMax = 2;
+  this.particleTick = 0;
 };
 
 $.stateMenu.exit = function () {
@@ -23,7 +26,10 @@ $.stateMenu.step = function (dt) {
 
   this.particles.each("step");
 
-  if (this.tick % 3 == 0) {
+  this.particleTick += $.game.dtNorm;
+
+  if (this.particleTick >= this.particleTickMax) {
+    this.particleTick = 0;
     this.particles.create({
       x: $.rand(100, 800),
       y: $.rand(120, 340),
@@ -86,6 +92,7 @@ $.stateMenu.render = function (dt) {
 
   $.ctx.font("40px droidsansmono");
   $.ctx.textAlign("center");
+  $.ctx.textBaseline("middle");
   if (this.hoveringButton) {
     $.ctx.fillStyle("hsla(120, 70%, 50%, 1)");
     $.ctx.fillRect(this.button.x, this.button.y, this.button.w, this.button.h);
@@ -95,7 +102,8 @@ $.stateMenu.render = function (dt) {
     $.ctx.fillRect(this.button.x, this.button.y, this.button.w, this.button.h);
     $.ctx.fillStyle("#222");
   }
-  $.ctx.fillText("PLAY", $.game.width / 2, 452);
+  // $.ctx.fillText("PLAY", $.game.width / 2, 452);
+  $.ctx.fillText("PLAY", $.game.width / 2, this.button.y + this.button.h / 2);
 
   $.ctx.drawImage(
     $.game.images["light"],
@@ -108,6 +116,10 @@ $.stateMenu.render = function (dt) {
 
 $.stateMenu.mousedown = function (e) {
   if (this.hoveringButton) {
+    if (!$.game.musicIsPlaying) {
+      $.game.musicIsPlaying = true;
+      $.game.music.play("music", true);
+    }
     $.game.setState($.stateTutorial);
   }
 };

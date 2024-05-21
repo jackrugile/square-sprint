@@ -11,16 +11,16 @@ $.particle.prototype.init = function (opt) {
 };
 
 $.particle.prototype.step = function () {
-  this.vx *= this.drag;
-  this.vy *= this.drag;
+  this.vx += -this.vx * (1 - Math.exp(-(1 - this.drag) * $.game.dtNorm));
+  this.vy += -this.vy * (1 - Math.exp(-(1 - this.drag) * $.game.dtNorm));
 
-  this.x += this.vx;
-  this.y += this.vy;
+  this.x += this.vx * $.game.dtNorm;
+  this.y += this.vy * $.game.dtNorm;
 
-  this.life -= this.decay;
+  this.life -= this.decay * $.game.dtNorm;
 
   if (this.radius < this.radiusBase) {
-    this.radius += 0.1;
+    this.radius += 0.1 * $.game.dtNorm;
   }
 
   if (this.life <= 0) {

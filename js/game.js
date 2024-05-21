@@ -34,6 +34,12 @@ $.game.create = function () {
   this.lastRoundTime = 0;
   this.lastRoundClicks = 0;
 
+  // delta time
+  this.dt = 0.016;
+  this.dtMs = 16;
+  this.dtNorm = 1;
+  this.dtTick = 0;
+
   // setup local storage
   $.storage = new $.storage("square-sprint");
 
@@ -73,21 +79,26 @@ $.game.ready = function () {
     //this.data[ 'test-level' ]
   ];
 
-  this.music.play("music", true);
+  // this.music.play("music", true);
 
   this.setState($.stateMenu);
 };
 
 $.game.step = function (dt) {
+  this.dt = dt;
+  this.dtMs = this.dt * 1000;
+  this.dtNorm = this.dt * 60;
+  this.dtTick += this.dtNorm;
+
   this.tick++;
 };
 
 $.game.renderCursor = function () {
-  var scale = 1 + Math.sin(this.tick * 0.1) * 0.25;
+  var scale = 1 + Math.sin(this.dtTick * 0.1) * 0.25;
   $.ctx.save();
   $.ctx.translate(this.mouse.x, this.mouse.y);
   $.ctx.scale(scale, scale);
-  $.ctx.rotate(this.tick * 0.05);
+  $.ctx.rotate(this.dtTick * 0.05);
   $.ctx.lineWidth(1);
   $.ctx.strokeStyle("#fff");
   $.ctx.strokeRect(-8, -8, 16, 16);

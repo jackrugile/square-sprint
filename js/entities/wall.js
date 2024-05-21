@@ -8,12 +8,10 @@ $.wall.prototype.init = function (opt) {
 
 $.wall.prototype.step = function () {
   if (this.clickTick > 0) {
-    this.clickTick--;
+    this.clickTick -= $.game.dtNorm;
   }
 
-  if (this.flashTick > 0) {
-    this.flashTick--;
-  }
+  this.clickTick = Math.max(this.clickTick, 0);
 };
 
 $.wall.prototype.render = function () {
@@ -25,7 +23,7 @@ $.wall.prototype.render = function () {
   $.ctx.fillStyle(
     this.clickTick
       ? "hsla(0, 0%, " +
-          (0.25 + (this.clickTick / this.clickTickMax) * 0.75 * 100) +
+          (0.25 + (this.clickTick / this.clickTickMax) * 0.75) * 100 +
           "%, 1)"
       : "#333"
   );

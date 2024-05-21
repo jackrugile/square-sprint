@@ -4,7 +4,11 @@ $.stateTutorial.create = function () {};
 
 $.stateTutorial.enter = function () {
   this.tick = 0;
+  this.dtTick = 0;
   this.particles = new $.pool($.particle, 100);
+
+  this.particleTickMax = 2;
+  this.particleTick = 0;
 };
 
 $.stateTutorial.exit = function () {
@@ -13,10 +17,14 @@ $.stateTutorial.exit = function () {
 
 $.stateTutorial.step = function (dt) {
   this.tick++;
+  this.dtTick += $.game.dtNorm;
 
   this.particles.each("step");
 
-  if (this.tick % 3 == 0) {
+  this.particleTick += $.game.dtNorm;
+
+  if (this.particleTick >= this.particleTickMax) {
+    this.particleTick = 0;
     this.particles.create({
       x: $.rand(0, $.game.width),
       y: $.rand(0, $.game.height),
@@ -28,7 +36,7 @@ $.stateTutorial.step = function (dt) {
     });
   }
 
-  if (this.tick > 200) {
+  if (this.dtTick > 200) {
     $.game.setState($.statePlay);
   }
 };
@@ -56,7 +64,7 @@ $.stateTutorial.render = function (dt) {
 
   $.ctx.drawImage(
     $.game.images["light"],
-    $.game.width / 2 - 1000 + Math.sin(this.tick / 150) * 100,
+    $.game.width / 2 - 1000 + Math.sin($.game.dtTick / 150) * 100,
     $.game.height / 2 - 600
   );
   $.ctx.drawImage($.game.images["screen-overlay"], 0, 0);

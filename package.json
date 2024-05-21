@@ -1,0 +1,14 @@
+{
+  "name": "square-sprint",
+  "description": "Square Sprint is a speed run click fest! Make your way through 10 levels of squares as fast and as accurately as possible.",
+  "repository": "https://github.com/jackrugile/square-sprint.git",
+  "homepage": "https://jackrugile.com/square-sprint/",
+  "author": "Jack Rugile <jack@jackrugile.com> (https://jackrugile.com)",
+  "license": "MIT",
+  "scripts": {
+    "dev": "http-server -c-1 -a localhost"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

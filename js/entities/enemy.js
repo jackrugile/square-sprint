@@ -3,6 +3,7 @@ $.enemy = function (opt) {};
 $.enemy.prototype.init = function (opt) {
   $.merge(this, opt);
   this.tick = 0;
+  this.dtTick = 0;
   this.dead = false;
   this.yBase = this.y;
   this.vy = 0;
@@ -13,14 +14,15 @@ $.enemy.prototype.init = function (opt) {
 
 $.enemy.prototype.step = function () {
   if (this.dead) {
-    this.vy += 1;
-    this.y += this.vy;
+    this.vy += $.game.dtNorm;
+    this.y += this.vy * $.game.dtNorm;
   } else {
     this.tick++;
+    this.dtTick += $.game.dtNorm;
   }
 
   if (this.deathTick > 0) {
-    this.deathTick--;
+    this.deathTick -= $.game.dtNorm;
   }
 
   if (!this.dead && this.checkCollision()) {
@@ -39,10 +41,10 @@ $.enemy.prototype.step = function () {
 
   if (this.dead && !this.hasCounted && this.deathTick <= 0) {
     if ($.game.state.shake.translate < 8) {
-      $.game.state.shake.translate += 1;
+      $.game.state.shake.translate += $.game.dtNorm;
     }
     if ($.game.state.shake.rotate < 0.025) {
-      $.game.state.shake.rotate += 0.004;
+      $.game.state.shake.rotate += 0.004 * $.game.dtNorm;
     }
     $.game.state.level.killed++;
     this.hasCounted = true;

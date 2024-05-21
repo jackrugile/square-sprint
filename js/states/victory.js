@@ -5,6 +5,8 @@ $.stateVictory.create = function () {};
 $.stateVictory.enter = function () {
   this.tick = 0;
   this.particles = new $.pool($.particle, 100);
+  this.particleTickMax = 1;
+  this.particleTick = 0;
 
   if (
     $.game.lastRoundTime < $.storage.get("fastestRun") ||
@@ -24,19 +26,24 @@ $.stateVictory.exit = function () {
 };
 
 $.stateVictory.step = function (dt) {
-  this.tick++;
+  this.tick += $.game.dtNorm;
 
   this.particles.each("step");
 
-  this.particles.create({
-    x: $.rand(0, $.game.width),
-    y: $.rand(0, $.game.height),
-    vx: $.rand(-0.25, 0.25),
-    vy: $.rand(-0.25, -1),
-    decay: 0.004,
-    hue: 0,
-    desaturated: true,
-  });
+  this.particleTick += $.game.dtNorm;
+
+  if (this.particleTick >= this.particleTickMax) {
+    this.particleTick = 0;
+    this.particles.create({
+      x: $.rand(0, $.game.width),
+      y: $.rand(0, $.game.height),
+      vx: $.rand(-0.25, 0.25),
+      vy: $.rand(-0.25, -1),
+      decay: 0.004,
+      hue: 0,
+      desaturated: true,
+    });
+  }
 };
 
 $.stateVictory.render = function (dt) {
@@ -65,8 +72,8 @@ $.stateVictory.render = function (dt) {
 
   $.ctx.drawImage(
     $.game.images["light"],
-    $.game.width / 2 - 900 + Math.sin(this.tick / 100) * 200,
-    $.game.height / 2 - 600 + Math.cos(this.tick / 175) * 75
+    $.game.width / 2 - $.game.width + Math.sin(this.tick / 100) * 200,
+    $.game.height / 2 - $.game.height + Math.cos(this.tick / 175) * 75
   );
   $.ctx.drawImage($.game.images["screen-overlay"], 0, 0);
   $.game.renderCursor();

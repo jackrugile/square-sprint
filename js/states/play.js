@@ -69,32 +69,41 @@ $.statePlay.step = function (dt) {
         $.game.lastRoundClicks = this.totalClicks;
         $.game.setState($.stateVictory);
       } else {
-        this.shake.translate += 0.2;
-        this.endStateTick++;
+        this.shake.translate += 0.2 * $.game.dtNorm;
+        this.endStateTick += $.game.dtNorm;
       }
     }
   }
 
-  this.lightPosition.x += (this.hero.x - 900 - this.lightPosition.x) * 0.2;
-  this.lightPosition.y += (this.hero.y - 600 - this.lightPosition.y) * 0.2;
+  this.lightPosition.x +=
+    (this.hero.x - $.game.width - this.lightPosition.x) *
+    (1 - Math.exp(-0.2 * $.game.dtNorm));
+  this.lightPosition.y +=
+    (this.hero.y - $.game.height - this.lightPosition.y) *
+    (1 - Math.exp(-0.2 * $.game.dtNorm));
 
+  let lerp = 1 - Math.exp(-(1 - 0.92) * $.game.dtNorm);
   if (this.shake.translate > 0) {
-    this.shake.translate *= 0.92;
+    this.shake.translate += -this.shake.translate * lerp;
   }
+  this.shake.translate = Math.max(this.shake.translate, 0);
 
   if (this.shake.rotate > 0) {
-    this.shake.rotate *= 0.92;
+    this.shake.rotate += -this.shake.rotate * lerp;
   }
+  this.shake.rotate = Math.max(this.shake.rotate, 0);
 
   if (this.levelFlashTick > 0) {
-    this.levelFlashTick *= 0.92;
+    this.levelFlashTick += -this.levelFlashTick * lerp;
   }
+  this.levelFlashTick = Math.max(this.levelFlashTick, 0);
 
   if (this.enemyFlashTick > 0) {
-    this.enemyFlashTick--;
+    this.enemyFlashTick -= $.game.dtNorm;
   }
+  this.enemyFlashTick = Math.max(this.enemyFlashTick, 0);
 
-  this.tick++;
+  this.tick += $.game.dtNorm;
 };
 
 $.statePlay.render = function (dt) {

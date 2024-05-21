@@ -32,6 +32,9 @@ $.hero = function (opt) {
   this.pulsing = 1;
   this.mouseAngle = 0;
   this.renderAngle = 0;
+
+  this.particleTickMax = 2;
+  this.particleTick = 0;
 };
 
 $.hero.prototype.step = function () {
@@ -72,7 +75,11 @@ $.hero.prototype.step = function () {
         this.x,
         this.y
       );
-      for (var i = 0; i < Math.ceil(this.chargeTweenDistance / 100); i++) {
+      for (
+        var i = 0;
+        i < Math.ceil((this.chargeTweenDistance / 100) * $.game.dtNorm);
+        i++
+      ) {
         var radius = $.rand(0, dist),
           x = this.chargeTail.x + Math.cos(this.chargeTweenAngle) * radius,
           y = this.chargeTail.y + Math.sin(this.chargeTweenAngle) * radius,
@@ -91,7 +98,10 @@ $.hero.prototype.step = function () {
     }
   }
 
-  if ($.game.state.tick % 2 == 0) {
+  this.particleTick += $.game.dtNorm;
+
+  if (this.particleTick >= this.particleTickMax) {
+    this.particleTick = 0;
     $.game.state.particles.create({
       x: this.x + $.rand(-this.radius, this.radius),
       y: this.y + $.rand(-this.radius, this.radius),
