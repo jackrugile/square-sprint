@@ -1,4 +1,4 @@
-# Square Sprintg
+# Square Sprint
 
 Square Sprint is a speed run click fest! Make your way through 10 levels of squares as fast and as accurately as possible.
 
