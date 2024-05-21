@@ -56,7 +56,8 @@ $.statePlay.step = function (dt) {
   this.hero.step();
 
   this.level.progress +=
-    (this.level.killed / this.level.total - this.level.progress) * 0.3;
+    (this.level.killed / this.level.total - this.level.progress) *
+    (1 - Math.exp(-0.3 * $.game.dtNorm));
 
   if (this.level.progress >= 0.999) {
     if (this.levelNumber < this.levelTotal) {
